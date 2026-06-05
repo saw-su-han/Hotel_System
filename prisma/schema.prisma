@@ -49,3 +49,41 @@ model RolePermission {
 
   @@map("role_permission")
 }
+
+model Customers {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+  phone String @unique
+}
+
+model Rooms {
+  id          Int     @id @default(autoincrement())
+  room_number String  @unique
+  room_type   String
+  price       Float
+  is_occupied Boolean @default(false)
+}
+
+model Bookings {
+  id           Int      @id @default(autoincrement())
+  customer_id  Int
+  user_id      Int
+  roomId       Int
+  checkInDate  DateTime
+  checkOutDate DateTime
+}
+
+model BookingRoom {
+  id         Int @id @default(autoincrement())
+  booking_id Int
+  room_id    Int
+}
+
+model Payments {
+  id             Int      @id @default(autoincrement())
+  booking_id     Int
+  amount         Float
+  payment_date   DateTime @default(now())
+  payment_method String
+}
