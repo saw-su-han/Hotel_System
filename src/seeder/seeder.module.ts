@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
-import { SeederService } from './seeder.service';
-import { SeederController } from './seeder.controller';
+import { ConfigModule } from '@nestjs/config';
+import { DataSeeder } from './data.seeder';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  controllers: [SeederController],
-  providers: [SeederService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    PrismaModule,
+  ],
+  providers: [DataSeeder],
+  exports: [DataSeeder],
 })
 export class SeederModule {}

@@ -19,11 +19,11 @@ model User {
   name     String?
   password String
   role     Role?   @relation(fields: [roleId], references: [id])
-  roleId   String?
+  roleId   Int?
 }
 
 model Permission {
-  id          String           @id @default(uuid())
+  id          Int              @id @default(autoincrement())
   action      String           @unique
   description String?
   roles       RolePermission[]
@@ -32,7 +32,7 @@ model Permission {
 }
 
 model Role {
-  id              String           @id @default(uuid())
+  id              Int              @id @default(autoincrement())
   name            String           @unique
   rolePermissions RolePermission[]
   users           User[]
@@ -41,9 +41,9 @@ model Role {
 }
 
 model RolePermission {
-  id           String     @id @default(uuid())
-  roleId       String     @map("role_id")
-  permissionId String     @map("permission_id")
+  id           Int        @id @default(autoincrement())
+  roleId       Int        @map("role_id")
+  permissionId Int        @map("permission_id")
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 

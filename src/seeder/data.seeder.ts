@@ -1,34 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma/prisma.service';
-import { ActivityAction, StaticModules } from 'src/database/generated/prisma/client';
+import { Injectable, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DataSeeder {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async seed() {
-    console.log('🌱 Seeding Super Admin, Roles, and Permissions...');
+    console.log('🌱 Seeding Super Admin, Roles, and Permissions...', {
+      prisma: !!this.prisma,
+      prismaKeys: this.prisma ? Object.keys(this.prisma).slice(0, 10) : [],
+    });
 
-    // 1. Create all permissions for all modules and actions
-    const allModules = Object.values(StaticModules);
-    const allActions = Object.values(ActivityAction);
-    const permissions: any[] = [];
+    const modules = [
+      'users',
+      'roles',
+      'customers',
+      'rooms',
+      'bookings',
+      'payments',
+    ];
+    const actions = ['create', 'read', 'update', 'delete'];
+    const permissionEntities: any[] = [];
 
-    for (const module of allModules) {
-      for (const action of allActions) {
+    for (const module of modules) {
+      for (const action of actions) {
+        // Construct the unique action string matching your schema structure (e.g., "rooms:create")
+        const actionString = `${module}:${action}`;
+
         let permission = await this.prisma.permission.findUnique({
-          where: {
-            module_action: { module, action },
-          },
+          where: { action: actionString },
         });
 
         if (!permission) {
           permission = await this.prisma.permission.create({
-            data: { module, action },
+            data: {
+              action: actionString,
+              description: `Allows ${action} operations on ${module}`,
+            },
           });
         }
-        permissions.push(permission);
+        permissionEntities.push(permission);
       }
     }
 
@@ -43,12 +55,11 @@ export class DataSeeder {
       });
     }
 
-    // 3. Create role-permissions (link permissions to the role)
-    for (const permission of permissions) {
+    for (const perm of permissionEntities) {
       const exists = await this.prisma.rolePermission.findFirst({
         where: {
           roleId: superAdminRole.id,
-          permissionId: permission.id,
+          permissionId: perm.id,
         },
       });
 
@@ -56,7 +67,7 @@ export class DataSeeder {
         await this.prisma.rolePermission.create({
           data: {
             roleId: superAdminRole.id,
-            permissionId: permission.id,
+            permissionId: perm.id,
           },
         });
       }
@@ -65,10 +76,10 @@ export class DataSeeder {
     // 4. Create a Super Admin User if one doesn't exist
     await this.createDefaultAdminUser(superAdminRole.id);
 
-    console.log('✅ Superadmin role and all permissions seeded!');
+    console.log('✅ Superadmin role and all permissions seeded successfully!');
   }
 
-  private async createDefaultAdminUser(roleId: string) {
+  private async createDefaultAdminUser(roleId: number) {
     const adminEmail = 'admin@example.com';
     const existingUser = await this.prisma.user.findUnique({
       where: { email: adminEmail },
@@ -79,7 +90,7 @@ export class DataSeeder {
       await this.prisma.user.create({
         data: {
           email: adminEmail,
-          username: 'System Administrator',
+          name: 'System Administrator',
           password: hashedPassword,
           roleId: roleId,
         },
