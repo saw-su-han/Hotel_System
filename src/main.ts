@@ -43,14 +43,31 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, documentFactory);
 
-  app.use(
-    '/reference',
-    apiReference({
-      content: documentFactory,
-      theme: 'default',
-    }),
-  );
+  async function bootstrap() {
+    const app = await NestFactory.create(AppModule);
 
-  await app.listen(3000);
+    const config = new DocumentBuilder()
+      .setTitle('Hotel Management API')
+      .setDescription(
+        'The API documentation for the Hotel System backend application.',
+      )
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+
+    SwaggerModule.setup('docs-raw', app, document);
+
+    app.use(
+      '/reference',
+      apiReference({
+        content: documentFactory,
+        theme: 'default',
+      }),
+    );
+
+    await app.listen(3000);
+  }
 }
 bootstrap();

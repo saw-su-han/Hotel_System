@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import * as streamifier from 'streamifier';
 import { config } from 'dotenv';
+import { Multer } from 'multer';
 
 config();
 

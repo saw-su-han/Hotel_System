@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
 import { change_passworddto } from './dto/change-password.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { RequirePermissions } from './decorators/permission.decorator';
 
 @Controller('auth')
 export class AuthController {
