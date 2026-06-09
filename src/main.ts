@@ -10,6 +10,10 @@ async function bootstrap() {
   // serve static files from the "uploads" directory
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/images/',
+  });
+
   // Enable DTO validation
   app.useGlobalPipes(
     new ValidationPipe({
