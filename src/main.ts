@@ -21,8 +21,8 @@ async function bootstrap() {
 
   //scalar
   const config = new DocumentBuilder()
-    .setTitle('Instagram-clone system')
-    .setDescription('Instagram-clone description')
+    .setTitle('Hotel system')
+    .setDescription('Hotel System description')
     .setVersion('1.0')
     .addBearerAuth(
       {
