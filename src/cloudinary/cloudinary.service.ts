@@ -14,6 +14,9 @@ cloudinary.config({
 
 @Injectable()
 export class CloudinaryService {
+  uploadFile(imageFile: Express.Multer.File) {
+    throw new Error('Method not implemented.');
+  }
   async uploadImageStream(file: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(

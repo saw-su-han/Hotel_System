@@ -1,56 +1,25 @@
-import {
-  IsString,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsEnum,
-  IsDateString,
-  IsBoolean,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCustomerDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  Name: string;
+  name: string;
 
+  @ApiProperty()
   @IsEmail()
-  @IsNotEmpty()
   email: string;
 
-  @IsPhoneNumber('IN')
-  @IsNotEmpty()
-  phoneNumber: string;
-
-  @IsEnum(['MALE', 'FEMALE', 'OTHER'])
-  @IsNotEmpty()
-  gender: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  dateOfBirth: string;
-
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  address?: string;
+  phone: string;
 
-  @IsString()
+  @ApiProperty()
   @IsNotEmpty()
-  nrc: string;
+  nrcFront: string;
 
-  @IsString()
-  @IsOptional()
-  image: string;
-
-  @IsBoolean()
-  @IsOptional()
-  isMember?: boolean;
-
-  @IsString()
-  @IsOptional()
-  membershipType?: string;
-
-  @IsDateString()
-  @IsOptional()
-  membershipExpiry?: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  nrcBack: string;
 }
