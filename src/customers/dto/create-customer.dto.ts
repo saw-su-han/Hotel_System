@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateCustomerDto {
   @ApiProperty()
@@ -15,11 +16,21 @@ export class CreateCustomerDto {
   @IsString()
   phone: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  nrcFront: string;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value ?? null)
+  nrcFront?: Express.Multer.File;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  nrcBack: string;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => value ?? null)
+  nrcBack?: Express.Multer.File;
 }
