@@ -1,7 +1,10 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +17,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
+  5;
 
   const document = SwaggerModule.createDocument(app, config);
 
@@ -22,17 +26,57 @@ async function bootstrap() {
   app.use(
     '/reference',
     apiReference({
-      spec: {
-        content: document,
-      },
-      theme: 'purple',
-      layout: 'modern',
+      content: document,
+      theme: 'default',
     }),
   );
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-  console.log(`Swagger UI is running on: http://localhost:${port}/docs-raw`);
-  console.log(`Scalar is running on: http://localhost:${port}/reference`);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  await app.listen(5000);
 }
+
+// async function bootstrap() {
+//   // serve static files from the "uploads" directory
+//   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+//   app.useStaticAssets(join(process.cwd(), 'uploads'), {
+//     prefix: '/images/',
+//   });
+
+//   // Enable DTO validation
+//   app.useGlobalPipes(
+//     new ValidationPipe({
+//       whitelist: true,
+//       forbidNonWhitelisted: true,
+//       transform: true,
+//     }),
+//   );
+
+//   //scalar
+//   const config = new DocumentBuilder()
+//     .setTitle('Hotel system')
+//     .setDescription('Hotel System description')
+//     .setVersion('1.0')
+//     .addBearerAuth(
+//       {
+//         type: 'http',
+//         scheme: 'bearer',
+//         bearerFormat: 'JWT',
+//       },
+//       'access-token',
+//     )
+//     .addTag('')
+//     .build();
+
+//   const documentFactory = () => SwaggerModule.createDocument(app, config);
+
+//   SwaggerModule.setup('api', app, documentFactory);
+
+// }
 bootstrap();

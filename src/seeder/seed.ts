@@ -9,15 +9,13 @@ async function runSeeders() {
   try {
     const dataSeeder = app.get(DataSeeder);
 
-    console.log(
-      '📝 Seeding authentication data (roles, permissions, users)...',
-    );
+    console.log('Seeding authentication data (roles, permissions, users)...');
     await dataSeeder.seed();
-    console.log('✅ Authentication seeding completed');
+    console.log(' Authentication seeding completed');
 
-    console.log('🎉 All seeders completed successfully!');
+    console.log(' All seeders completed successfully!');
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error(' Seeding failed:', error);
     process.exit(1);
   } finally {
     await app.close();
@@ -25,6 +23,6 @@ async function runSeeders() {
 }
 
 runSeeders().catch((error) => {
-  console.error('❌ Fatal error during seeding:', error);
+  console.error(' Fatal error during seeding:', error);
   process.exit(1);
 });

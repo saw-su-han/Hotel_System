@@ -14,12 +14,15 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String
-  role     Role?   @relation(fields: [roleId], references: [id])
-  roleId   Int?
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  name      String?
+  password  String
+  role      Role?   @relation(fields: [roleId], references: [id])
+  roleId    Int?
+  isDeleted Boolean @default(false)
+
+  bookings Bookings[]
 }
 
 model Permission {
@@ -27,6 +30,7 @@ model Permission {
   action      String           @unique
   description String?
   roles       RolePermission[]
+  isDeleted   Boolean          @default(false)
 
   @@map("permissions")
 }
@@ -36,6 +40,7 @@ model Role {
   name            String           @unique
   rolePermissions RolePermission[]
   users           User[]
+  isDeleted       Boolean          @default(false)
 
   @@map("roles")
 }
@@ -46,44 +51,87 @@ model RolePermission {
   permissionId Int        @map("permission_id")
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  isDeleted    Boolean    @default(false)
 
   @@map("role_permission")
 }
 
 model Customers {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
-  phone String @unique
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  phone     String  @unique
+  isDeleted Boolean @default(false)
+  nrcFront  String  @unique
+  nrcBack   String  @unique
+
+  bookings Bookings[]
 }
 
 model Rooms {
-  id          Int     @id @default(autoincrement())
-  room_number String  @unique
-  room_type   String
-  price       Float
-  is_occupied Boolean @default(false)
+  id         Int    @id @default(autoincrement())
+  roomNumber String @unique
+
+  isDeleted Boolean @default(false)
+
+  roomTypeId Int
+  roomType   roomtypes @relation(fields: [roomTypeId], references: [id])
+
+  bookingRooms BookingRoom[]
 }
 
 model Bookings {
-  id           Int      @id @default(autoincrement())
-  customer_id  Int
-  user_id      Int
-  roomId       Int
+  id Int @id @default(autoincrement())
+
+  customerId Int
+  customer   Customers @relation(fields: [customerId], references: [id])
+
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  isDeleted Boolean @default(false)
+
   checkInDate  DateTime
   checkOutDate DateTime
+
+  bookingRooms BookingRoom[]
 }
 
 model BookingRoom {
-  id         Int @id @default(autoincrement())
-  booking_id Int
-  room_id    Int
+  id Int @id @default(autoincrement())
+
+  bookingId Int
+  roomId    Int
+  isDeleted Boolean @default(false)
+
+  booking   Bookings    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  room      Rooms       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomTypes roomtypes[]
+
+  @@unique([bookingId, roomId])
 }
 
 model Payments {
-  id             Int      @id @default(autoincrement())
-  booking_id     Int
-  amount         Float
-  payment_date   DateTime @default(now())
-  payment_method String
+  id            Int      @id @default(autoincrement())
+  bookingId     Int
+  amount        Float
+  paymentDate   DateTime @default(now())
+  paymentMethod String
+  isDeleted     Boolean  @default(false)
+}
+
+model roomtypes {
+  id          Int    @id @default(autoincrement())
+  roomType    String @unique
+  price       Float
+  description String
+  imageUrl    String
+  size        String
+  bathType    String
+  viewType    String
+
+  isDeleted Boolean @default(false)
+
+  rooms Rooms[]
+
+  bookingRooms BookingRoom[]
 }

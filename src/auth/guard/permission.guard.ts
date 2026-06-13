@@ -1,4 +1,3 @@
-
 import {
   Injectable,
   CanActivate,
@@ -7,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permission.decorator';
+import { permission } from 'node:process';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -28,7 +28,9 @@ export class PermissionsGuard implements CanActivate {
 
     // Check if user object exists and has the permissions array populated
     if (!user || !Array.isArray(user.permissions)) {
-      throw new ForbiddenException('Access denied: User permissions not initialized.');
+      throw new ForbiddenException(
+        'Access denied: User permissions not initialized.',
+      );
     }
 
     // Check if the user has EVERY single permission required by the decorator
@@ -37,7 +39,9 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (!hasAllPermissions) {
-      const missing = requiredPermissions.filter(p => !user.permissions.includes(p));
+      const missing = requiredPermissions.filter(
+        (p) => !user.permissions.includes(p),
+      );
       throw new ForbiddenException(
         `Missing required permissions: ${missing.join(', ')}`,
       );

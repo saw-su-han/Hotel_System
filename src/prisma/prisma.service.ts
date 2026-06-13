@@ -8,6 +8,7 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  // [x: string]: any;
   private pool: Pool;
 
   constructor() {
